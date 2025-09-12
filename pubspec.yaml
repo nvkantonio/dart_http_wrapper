@@ -1,12 +1,16 @@
 name: http_wrapper
-description: A starting point for Dart libraries or applications.
 version: 0.0.1
 
+description: A simple dart:http wrapper using validator and parser
+repository: https://github.com/nvkantonio/dart_http_wrapper
+homepage: https://github.com/nvkantonio/dart_http_wrapper
+issue_tracker: https://github.com/nvkantonio/dart_http_wrapper/issues
+
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.0.0
 
 dependencies:
-  http: ^1.5.0
+  http: ^1.0.0
 
 dev_dependencies:
   lints: ^5.0.0
