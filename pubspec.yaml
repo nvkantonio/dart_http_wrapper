@@ -1,5 +1,5 @@
 name: http_wrapper
-version: 0.0.1
+version: 0.0.2
 
 description: A simple dart:http wrapper using validator and parser
 repository: https://github.com/nvkantonio/dart_http_wrapper

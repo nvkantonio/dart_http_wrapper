@@ -2,11 +2,17 @@ import 'package:http/http.dart';
 
 // Api response exeption
 abstract class ResponseExeption implements Exception {
-  const ResponseExeption([this.message = '', this.source, this.response]);
+  const ResponseExeption({
+    this.message = '',
+    this.source,
+    this.causedError,
+    this.response,
+  });
 
   final String message;
   final dynamic source;
-  final StreamedResponse? response;
+  final Object? causedError;
+  final BaseResponse? response;
 
   @override
   String toString() {
@@ -16,24 +22,40 @@ abstract class ResponseExeption implements Exception {
 
 /// Use on invalid api response exeptions
 class InvalidResponseExeption extends ResponseExeption {
-  const InvalidResponseExeption([super.message, super.source, super.response]);
+  const InvalidResponseExeption({
+    super.message,
+    super.source,
+    super.response,
+    super.causedError,
+  });
 }
 
 /// Use on parse exeptions
 class ResponseParseExeption extends InvalidResponseExeption {
-  const ResponseParseExeption([super.message, super.source, super.response]);
+  const ResponseParseExeption({
+    super.message,
+    super.source,
+    super.response,
+    super.causedError,
+  });
 }
 
 /// Use on valid api response exeptions
 abstract class HandeledResponseExeption extends ResponseExeption {
-  const HandeledResponseExeption([super.message, super.source, super.response]);
+  const HandeledResponseExeption({
+    super.message,
+    super.source,
+    super.response,
+    super.causedError,
+  });
 }
 
 /// Use on failed validation api response
 class ResponseValidationExeption extends HandeledResponseExeption {
-  const ResponseValidationExeption([
+  const ResponseValidationExeption({
     super.message,
     super.source,
     super.response,
-  ]);
+    super.causedError,
+  });
 }

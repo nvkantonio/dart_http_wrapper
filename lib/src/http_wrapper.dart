@@ -30,9 +30,10 @@ Future<R> httpWrapper<R>({
     jsonResponse = jsonDecode(response);
   } catch (e) {
     throw InvalidResponseExeption(
-      'Cannot decode response',
-      e,
-      streamedResponse,
+      message: 'Cannot decode response',
+      source: response,
+      causedError: e,
+      response: streamedResponse,
     );
   }
 
@@ -44,9 +45,10 @@ Future<R> httpWrapper<R>({
     rethrow;
   } catch (e) {
     InvalidResponseExeption(
-      'Validator function sent unhandled exeption',
-      e,
-      streamedResponse,
+      message: 'Validator function sent unhandled exeption',
+      source: response,
+      causedError: e,
+      response: streamedResponse,
     );
   }
 
@@ -55,7 +57,12 @@ Future<R> httpWrapper<R>({
   } on ResponseExeption {
     rethrow;
   } catch (e) {
-    throw ResponseParseExeption(e.toString(), e, streamedResponse);
+    throw ResponseParseExeption(
+      message: e.toString(),
+      source: response,
+      causedError: e,
+      response: streamedResponse,
+    );
   }
 }
 
