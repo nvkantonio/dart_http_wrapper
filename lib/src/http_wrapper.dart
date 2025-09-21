@@ -7,13 +7,21 @@ import 'http_wrapper_exeptions.dart';
 
 typedef ParserFunction<T> = FutureOr<T> Function(dynamic response);
 typedef ValidatorFunction = FutureOr Function(dynamic parsedJson);
+typedef ValidatorFunctionWithResponse = FutureOr Function(
+    dynamic parsedJson, Response response);
 
 Future<R> httpWrapper<R>({
   required BaseRequest request,
   required ParserFunction<R> parserFunction,
   ValidatorFunction? validatorFunction,
+  ValidatorFunctionWithResponse? validatorFunctionWithResponse,
   @Deprecated('Set encoding for request') Encoding? encoding,
 }) async {
+  assert(
+    validatorFunction == null || validatorFunctionWithResponse == null,
+    'Either validatorFunction or validatorFunctionWithResponse should be used for httpWrapper',
+  );
+
   final Response response;
   final dynamic parsedJson;
 
@@ -35,9 +43,8 @@ Future<R> httpWrapper<R>({
   }
 
   try {
-    if (validatorFunction != null) {
-      await validatorFunction(parsedJson);
-    }
+    await validatorFunction?.call(parsedJson);
+    await validatorFunctionWithResponse?.call(parsedJson, response);
   } on ResponseExeption {
     rethrow;
   } catch (e) {
@@ -68,6 +75,7 @@ Future<R> getRequest<R>({
   required ParserFunction<R> parserFunction,
   Map<String, String>? headers,
   ValidatorFunction? validatorFunction,
+  ValidatorFunctionWithResponse? validatorFunctionWithResponse,
   @Deprecated('Set encoding for request') Encoding? encoding,
 }) {
   final request = Request('GET', uri);
@@ -81,6 +89,7 @@ Future<R> getRequest<R>({
     parserFunction: parserFunction,
     encoding: encoding,
     validatorFunction: validatorFunction,
+    validatorFunctionWithResponse: validatorFunctionWithResponse,
   );
 }
 
@@ -90,6 +99,7 @@ Future<R> postRequest<R>({
   Map<String, String>? headers,
   Map<String, dynamic>? body,
   ValidatorFunction? validatorFunction,
+  ValidatorFunctionWithResponse? validatorFunctionWithResponse,
   @Deprecated('Set encoding for request') Encoding? encoding,
 }) {
   final request = Request('POST', uri);
@@ -107,6 +117,7 @@ Future<R> postRequest<R>({
     parserFunction: parserFunction,
     encoding: encoding,
     validatorFunction: validatorFunction,
+    validatorFunctionWithResponse: validatorFunctionWithResponse,
   );
 }
 
@@ -115,6 +126,7 @@ Future<R> getMultipartRequest<R>({
   required ParserFunction<R> parserFunction,
   Map<String, String>? headers,
   ValidatorFunction? validatorFunction,
+  ValidatorFunctionWithResponse? validatorFunctionWithResponse,
   @Deprecated('Set encoding for request') Encoding? encoding,
 }) {
   final request = MultipartRequest('GET', uri);
@@ -128,6 +140,7 @@ Future<R> getMultipartRequest<R>({
     parserFunction: parserFunction,
     encoding: encoding,
     validatorFunction: validatorFunction,
+    validatorFunctionWithResponse: validatorFunctionWithResponse,
   );
 }
 
@@ -138,6 +151,7 @@ Future<R> postMultipartRequest<R>({
   Map<String, String>? fields,
   Iterable<MultipartFile>? files,
   ValidatorFunction? validatorFunction,
+  ValidatorFunctionWithResponse? validatorFunctionWithResponse,
   @Deprecated('Set encoding for request') Encoding? encoding,
 }) {
   final request = MultipartRequest('GET', uri);
@@ -159,5 +173,6 @@ Future<R> postMultipartRequest<R>({
     parserFunction: parserFunction,
     encoding: encoding,
     validatorFunction: validatorFunction,
+    validatorFunctionWithResponse: validatorFunctionWithResponse,
   );
 }
