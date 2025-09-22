@@ -5,11 +5,40 @@ import 'package:http/http.dart';
 
 import 'http_wrapper_exeptions.dart';
 
-typedef ParserFunction<T> = FutureOr<T> Function(dynamic response);
-typedef ValidatorFunction = FutureOr Function(dynamic parsedJson);
+typedef ParserFunction<T> = FutureOr<T> Function(dynamic json);
+typedef ValidatorFunction = FutureOr Function(dynamic json);
 typedef ValidatorFunctionWithResponse = FutureOr Function(
-    dynamic parsedJson, Response response);
+    dynamic json, Response response);
 
+/// Base http request processor
+///
+/// ---
+///
+/// ```dart
+/// /// Create request with parse model type.
+/// await httpWrapper(
+///   /// Add your api uri
+///   request: Request("GET", Uri.parse('your_uri')),
+///   parserFunction: (json) {
+///     /// Define your model parser.
+///     return json;
+///   },
+///   headers: {
+///     /// Define your request headers.
+///   },
+/// validatorFunction: (dynamic json) {
+///   /// Define your response validator.
+///   ///
+///   /// On found exeption throw [ResponseValidationExeption] (inherited
+///   /// from [HandeledResponseExeption]) or [ResponseInvalidExeption].
+///   /// Or event create custom exeptions extending
+///   /// [HandeledResponseExeption] or [ResponseExeption].
+///   return;
+/// },
+///
+/// );
+
+/// ```
 Future<R> httpWrapper<R>({
   required BaseRequest request,
   required ParserFunction<R> parserFunction,
@@ -23,7 +52,7 @@ Future<R> httpWrapper<R>({
   );
 
   final Response response;
-  final dynamic parsedJson;
+  final dynamic json;
 
   try {
     response = await Response.fromStream(await request.send());
@@ -32,7 +61,7 @@ Future<R> httpWrapper<R>({
   }
 
   try {
-    parsedJson = jsonDecode(response.body);
+    json = jsonDecode(response.body);
   } catch (e) {
     throw InvalidResponseExeption(
       message: 'Cannot decode response',
@@ -43,33 +72,34 @@ Future<R> httpWrapper<R>({
   }
 
   try {
-    await validatorFunction?.call(parsedJson);
-    await validatorFunctionWithResponse?.call(parsedJson, response);
+    await validatorFunction?.call(json);
+    await validatorFunctionWithResponse?.call(json, response);
   } on ResponseExeption {
     rethrow;
   } catch (e) {
     InvalidResponseExeption(
       message: 'Validator function sent unhandled exeption',
-      source: parsedJson,
+      source: json,
       causedError: e,
       response: response,
     );
   }
 
   try {
-    return await parserFunction(parsedJson);
+    return await parserFunction(json);
   } on ResponseExeption {
     rethrow;
   } catch (e) {
     throw ResponseParseExeption(
       message: e.toString(),
-      source: parsedJson,
+      source: json,
       causedError: e,
       response: response,
     );
   }
 }
 
+/// Shorthand for `httpWrapper()` with "GET" Request
 Future<R> getRequest<R>({
   required Uri uri,
   required ParserFunction<R> parserFunction,
@@ -93,6 +123,7 @@ Future<R> getRequest<R>({
   );
 }
 
+/// Shorthand for `httpWrapper()` with "POST" Request
 Future<R> postRequest<R>({
   required Uri uri,
   required ParserFunction<R> parserFunction,
@@ -121,6 +152,7 @@ Future<R> postRequest<R>({
   );
 }
 
+/// Shorthand for `httpWrapper()` with "GET" MultipartRequest
 Future<R> getMultipartRequest<R>({
   required Uri uri,
   required ParserFunction<R> parserFunction,
@@ -144,6 +176,7 @@ Future<R> getMultipartRequest<R>({
   );
 }
 
+/// Shorthand for `httpWrapper()` with "POST" MultipartRequest
 Future<R> postMultipartRequest<R>({
   required Uri uri,
   required ParserFunction<R> parserFunction,

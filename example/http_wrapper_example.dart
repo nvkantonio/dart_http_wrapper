@@ -1,13 +1,13 @@
-import 'dart:convert';
+import 'package:http/http.dart';
 import 'package:http_wrapper/http_wrapper.dart';
 
 Future<void> main() async {
-  /// Create request with parsed model type
+  /// Create request with parse model type.
   final model = await postRequest<Object>(
     /// Add your api uri
     uri: Uri.parse('your_uri'),
-    validatorFunction: (response) {
-      /// Define your response validator
+    validatorFunction: (dynamic json) {
+      /// Define your response validator.
       ///
       /// On found exeption throw [ResponseValidationExeption] (inherited
       /// from [HandeledResponseExeption]) or [ResponseInvalidExeption].
@@ -15,18 +15,36 @@ Future<void> main() async {
       /// [HandeledResponseExeption] or [ResponseExeption].
       return;
     },
-    parserFunction: (response) {
-      /// Define your model parser
-      return response;
+    parserFunction: (dynamic json) {
+      /// Define your model parser.
+      return json;
     },
-    encoding: utf8,
     headers: {
-      /// Define your request headers
+      /// Define your request headers.
     },
     body: {
-      /// Define your request body
+      /// Define your request body.
     },
   );
 
   print(model);
+
+  final model1 = await httpWrapper(
+    request: Request("GET", Uri.parse('your_uri')),
+    parserFunction: (json) => json,
+  );
+
+  print(model1);
+
+  final model2 = await httpWrapper(
+    request: Request("GET", Uri.parse('your_uri')),
+    parserFunction: (json) => json,
+    validatorFunctionWithResponse: (json, response) {
+      if (response.statusCode != 200) {
+        throw 'Status code is ${response.statusCode}';
+      }
+    },
+  );
+
+  print(model2);
 }
