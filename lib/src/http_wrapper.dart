@@ -187,7 +187,7 @@ Future<R> postMultipartRequest<R>({
   ValidatorFunctionWithResponse? validatorFunctionWithResponse,
   @Deprecated('Set encoding for request') Encoding? encoding,
 }) {
-  final request = MultipartRequest('GET', uri);
+  final request = MultipartRequest('POST', uri);
 
   if (headers != null) {
     request.headers.addAll(headers);
