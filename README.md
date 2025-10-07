@@ -1,3 +1,5 @@
+# Http_wrapper
+
 A simple [dart:http](https://pub.dev/packages/http) wrapper using validator and parser.
 
 ## Usage
@@ -63,8 +65,8 @@ Future<void> main() async {
 Use `httpWrapper()` to define your own request.
 
 Avalible requests shortHands for httpWrapper:
+
 - `getRequest()`
 - `postRequest()`
 - `getMultipartRequest()`
 - `postMultipartRequest()`
-

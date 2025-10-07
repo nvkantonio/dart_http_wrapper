@@ -12,21 +12,16 @@ typedef ValidatorFunctionWithResponse = FutureOr Function(
 
 /// Base http request processor
 ///
-/// ---
-///
 /// ```dart
-/// /// Create request with parse model type.
-/// await httpWrapper(
-///   /// Add your api uri
+/// await httpWrapper<R>(
+///   /// Add your api request
 ///   request: Request("GET", Uri.parse('your_uri')),
+///   {@template http_wrapper_params}
 ///   parserFunction: (json) {
 ///     /// Define your model parser.
-///     return json;
+///     return json as R;
 ///   },
-///   headers: {
-///     /// Define your request headers.
-///   },
-/// validatorFunction: (dynamic json) {
+///   validatorFunction: (dynamic json) {
 ///   /// Define your response validator.
 ///   ///
 ///   /// On found exeption throw [ResponseValidationExeption] (inherited
@@ -34,11 +29,11 @@ typedef ValidatorFunctionWithResponse = FutureOr Function(
 ///   /// Or event create custom exeptions extending
 ///   /// [HandeledResponseExeption] or [ResponseExeption].
 ///   return;
-/// },
-///
+///   },
+///   {@endtemplate}
 /// );
-
 /// ```
+///
 Future<R> httpWrapper<R>({
   required BaseRequest request,
   ParserFunction<R>? parserFunction,
@@ -104,6 +99,18 @@ Future<R> httpWrapper<R>({
 }
 
 /// Shorthand for `httpWrapper()` with "GET" Request
+///
+/// ```dart
+/// await getRequest<R>(
+///   /// Add your api uri
+///   request: Uri.parse('your_uri'),
+///   headers: {
+///     /// Define your request headers.
+///   },
+///   {@macro http_wrapper_params}
+/// );
+/// ```
+///
 Future<R> getRequest<R>({
   required Uri uri,
   ParserFunction<R>? parserFunction,
@@ -128,6 +135,21 @@ Future<R> getRequest<R>({
 }
 
 /// Shorthand for `httpWrapper()` with "POST" Request
+///
+/// ```dart
+/// await postRequest<R>(
+///   /// Add your api uri
+///   request: Uri.parse('your_uri'),
+///   headers: {
+///     /// Define your request headers.
+///   },
+///   body: {
+///     /// Define your request body.
+///   },
+///   {@macro http_wrapper_params}
+/// );
+/// ```
+///
 Future<R> postRequest<R>({
   required Uri uri,
   ParserFunction<R>? parserFunction,
@@ -157,6 +179,18 @@ Future<R> postRequest<R>({
 }
 
 /// Shorthand for `httpWrapper()` with "GET" MultipartRequest
+///
+/// ```dart
+/// await getMultipartRequest<R>(
+///   /// Add your api uri
+///   request: Uri.parse('your_uri'),
+///   headers: {
+///     /// Define your request headers.
+///   },
+///   {@macro http_wrapper_params}
+/// );
+/// ```
+///
 Future<R> getMultipartRequest<R>({
   required Uri uri,
   ParserFunction<R>? parserFunction,
@@ -181,6 +215,24 @@ Future<R> getMultipartRequest<R>({
 }
 
 /// Shorthand for `httpWrapper()` with "POST" MultipartRequest
+///
+/// ```dart
+/// await postMultipartRequest<R>(
+///   /// Add your api uri
+///   request: Uri.parse('your_uri'),
+///   headers: {
+///     /// Define your request headers.
+///   },
+///   fields: {
+///     /// Define your request fields.
+///   }
+///   files: {
+///     /// Define your request files.
+///   }
+///   {@macro http_wrapper_params}
+/// );
+/// ```
+///
 Future<R> postMultipartRequest<R>({
   required Uri uri,
   ParserFunction<R>? parserFunction,
