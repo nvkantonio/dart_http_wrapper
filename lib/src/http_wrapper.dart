@@ -41,7 +41,7 @@ typedef ValidatorFunctionWithResponse = FutureOr Function(
 /// ```
 Future<R> httpWrapper<R>({
   required BaseRequest request,
-  required ParserFunction<R> parserFunction,
+  ParserFunction<R>? parserFunction,
   ValidatorFunction? validatorFunction,
   ValidatorFunctionWithResponse? validatorFunctionWithResponse,
   @Deprecated('Set encoding for request') Encoding? encoding,
@@ -85,24 +85,28 @@ Future<R> httpWrapper<R>({
     );
   }
 
-  try {
-    return await parserFunction(json);
-  } on ResponseExeption {
-    rethrow;
-  } catch (e) {
-    throw ResponseParseExeption(
-      message: e.toString(),
-      source: json,
-      causedError: e,
-      response: response,
-    );
+  if (parserFunction != null) {
+    try {
+      return await parserFunction(json);
+    } on ResponseExeption {
+      rethrow;
+    } catch (e) {
+      throw ResponseParseExeption(
+        message: e.toString(),
+        source: json,
+        causedError: e,
+        response: response,
+      );
+    }
+  } else {
+    return json;
   }
 }
 
 /// Shorthand for `httpWrapper()` with "GET" Request
 Future<R> getRequest<R>({
   required Uri uri,
-  required ParserFunction<R> parserFunction,
+  ParserFunction<R>? parserFunction,
   Map<String, String>? headers,
   ValidatorFunction? validatorFunction,
   ValidatorFunctionWithResponse? validatorFunctionWithResponse,
@@ -126,7 +130,7 @@ Future<R> getRequest<R>({
 /// Shorthand for `httpWrapper()` with "POST" Request
 Future<R> postRequest<R>({
   required Uri uri,
-  required ParserFunction<R> parserFunction,
+  ParserFunction<R>? parserFunction,
   Map<String, String>? headers,
   Map<String, dynamic>? body,
   ValidatorFunction? validatorFunction,
@@ -155,7 +159,7 @@ Future<R> postRequest<R>({
 /// Shorthand for `httpWrapper()` with "GET" MultipartRequest
 Future<R> getMultipartRequest<R>({
   required Uri uri,
-  required ParserFunction<R> parserFunction,
+  ParserFunction<R>? parserFunction,
   Map<String, String>? headers,
   ValidatorFunction? validatorFunction,
   ValidatorFunctionWithResponse? validatorFunctionWithResponse,
@@ -179,7 +183,7 @@ Future<R> getMultipartRequest<R>({
 /// Shorthand for `httpWrapper()` with "POST" MultipartRequest
 Future<R> postMultipartRequest<R>({
   required Uri uri,
-  required ParserFunction<R> parserFunction,
+  ParserFunction<R>? parserFunction,
   Map<String, String>? headers,
   Map<String, String>? fields,
   Iterable<MultipartFile>? files,

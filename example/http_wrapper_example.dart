@@ -38,7 +38,6 @@ Future<void> main() async {
 
   final model2 = await httpWrapper(
     request: Request("GET", Uri.parse('your_uri')),
-    parserFunction: (json) => json,
     validatorFunctionWithResponse: (json, response) {
       if (response.statusCode != 200) {
         throw 'Status code is ${response.statusCode}';
