@@ -64,7 +64,7 @@ Future<R> httpWrapper<R>({
     json = jsonDecode(response.body);
   } catch (e) {
     throw InvalidResponseExeption(
-      message: 'Cannot decode response',
+      message: 'Cannot parse response to json',
       source: response.body,
       causedError: e,
       response: response,
@@ -78,7 +78,7 @@ Future<R> httpWrapper<R>({
     rethrow;
   } catch (e) {
     InvalidResponseExeption(
-      message: 'Validator function sent unhandled exeption',
+      message: 'Validator function cathed unhandled exeption',
       source: json,
       causedError: e,
       response: response,
