@@ -1,3 +1,7 @@
+## 0.0.7
+
+- Fix: Corrected typos including class names
+
 ## 0.0.6
 
 - Rework:

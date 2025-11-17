@@ -15,10 +15,10 @@ Future<void> main() async {
     validatorFunction: (dynamic  json) {
       /// Define your response validator.
       ///
-      /// On found exeption throw [ResponseValidationExeption] (inherited
-      /// from [HandeledResponseExeption]) or [ResponseInvalidExeption].
-      /// Or event create custom exeptions extending
-      /// [HandeledResponseExeption] or [ResponseExeption].
+      /// On found exception throw [ResponseValidationException] (inherited
+      /// from [HandledResponseException]) or [ResponseInvalidException].
+      /// Or event create custom exceptions extending
+      /// [HandledResponseException] or [ResponseException].
       return;
     },
     parserFunction: (dynamic  json) {
@@ -64,7 +64,7 @@ Future<void> main() async {
 
 Use `httpWrapper()` to define your own request.
 
-Avalible requests shortHands for httpWrapper:
+Available requests shortHands for httpWrapper:
 
 - `getRequest()`
 - `postRequest()`

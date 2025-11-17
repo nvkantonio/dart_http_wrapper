@@ -1,7 +1,7 @@
 import 'package:http/http.dart';
 
-// Api response exeption
-abstract interface class ResponseExeption implements Exception {
+// Api response exception
+abstract interface class ResponseException implements Exception {
   String get message;
   dynamic get source;
   Object? get causedError;
@@ -13,9 +13,9 @@ abstract interface class ResponseExeption implements Exception {
   }
 }
 
-/// Use on valid api response exeptions
-class HandeledResponseExeption implements ResponseExeption {
-  const HandeledResponseExeption({
+/// Use on valid api response exception
+class HandledResponseException implements ResponseException {
+  const HandledResponseException({
     this.message = '',
     this.source,
     this.causedError,
@@ -32,9 +32,9 @@ class HandeledResponseExeption implements ResponseExeption {
   final Response? response;
 }
 
-/// Use on invalid api response exeptions
-class InvalidResponseExeption implements ResponseExeption {
-  const InvalidResponseExeption({
+/// Use on invalid api response exceptions
+class InvalidResponseException implements ResponseException {
+  const InvalidResponseException({
     this.message = '',
     this.source,
     this.causedError,
@@ -51,9 +51,9 @@ class InvalidResponseExeption implements ResponseExeption {
   final Response? response;
 }
 
-/// Use on parse exeptions
-class ResponseParseExeption extends InvalidResponseExeption {
-  const ResponseParseExeption({
+/// Use on parse exceptions
+class ResponseParseException extends InvalidResponseException {
+  const ResponseParseException({
     super.message,
     super.source,
     super.response,
@@ -62,8 +62,8 @@ class ResponseParseExeption extends InvalidResponseExeption {
 }
 
 /// Use on failed validation api response
-class ResponseValidationExeption extends HandeledResponseExeption {
-  const ResponseValidationExeption({
+class ResponseValidationException extends HandledResponseException {
+  const ResponseValidationException({
     super.message = '',
     super.source,
     super.causedError,

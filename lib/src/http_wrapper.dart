@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 
-import 'http_wrapper_exeptions.dart';
+import 'http_wrapper_exceptions.dart';
 
 typedef ParserFunction<T> = FutureOr<T> Function(dynamic json);
 typedef ValidatorFunction = FutureOr Function(dynamic json);
@@ -24,10 +24,10 @@ typedef ValidatorFunctionWithResponse = FutureOr Function(
 ///   validatorFunction: (dynamic json) {
 ///   /// Define your response validator.
 ///   ///
-///   /// On found exeption throw [ResponseValidationExeption] (inherited
-///   /// from [HandeledResponseExeption]) or [ResponseInvalidExeption].
-///   /// Or event create custom exeptions extending
-///   /// [HandeledResponseExeption] or [ResponseExeption].
+///   /// On found exception throw [ResponseValidationException] (inherited
+///   /// from [HandledResponseException]) or [ResponseInvalidException].
+///   /// Or event create custom exceptions extending
+///   /// [HandledResponseException] or [ResponseException].
 ///   return;
 ///   },
 ///   {@endtemplate}
@@ -58,7 +58,7 @@ Future<R> httpWrapper<R>({
   try {
     json = jsonDecode(response.body);
   } catch (e) {
-    throw InvalidResponseExeption(
+    throw InvalidResponseException(
       message: 'Cannot parse response to json',
       source: response.body,
       causedError: e,
@@ -69,11 +69,11 @@ Future<R> httpWrapper<R>({
   try {
     await validatorFunction?.call(json);
     await validatorFunctionWithResponse?.call(json, response);
-  } on ResponseExeption {
+  } on ResponseException {
     rethrow;
   } catch (e) {
-    InvalidResponseExeption(
-      message: 'Validator function cathed unhandled exeption',
+    InvalidResponseException(
+      message: 'Validator function caught unhandled exception',
       source: json,
       causedError: e,
       response: response,
@@ -83,10 +83,10 @@ Future<R> httpWrapper<R>({
   if (parserFunction != null) {
     try {
       return await parserFunction(json);
-    } on ResponseExeption {
+    } on ResponseException {
       rethrow;
     } catch (e) {
-      throw ResponseParseExeption(
+      throw ResponseParseException(
         message: e.toString(),
         source: json,
         causedError: e,
