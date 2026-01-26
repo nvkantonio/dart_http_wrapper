@@ -37,7 +37,7 @@ Future<void> main() async {
 }
 ```
 
-Validator with Response object:
+Validator and parser with ResponseData object:
 
 ```dart
 import 'package:http_wrapper/http_wrapper.dart';
@@ -46,14 +46,23 @@ Future<void> main() async {
   final model = await postRequest<Object>(
     /// Add your api uri
     uri: Uri.parse('your_uri'),
-    validatorFunctionWithResponse: (dynamic json, Response response) {
-      /// For e.g. use `if (response.statusCode == 200)` to check response status code.
-      if (response.statusCode != 200) {
-        throw 'Status code is ${response.statusCode}';
+    validatorFunctionFromData: (data) {
+      /// For e.g. use `if (data.response.statusCode == 200)` to check
+      /// response status code.
+      if (data.response.statusCode != 200) {
+        throw 'Status code is ${data.response.statusCode}';
       }
       return;
     },
-    parserFunction: (response) => response,
+    parserFunctionFromData: (data) {
+      /// For e.g. use `data.request.method` for better exception explanations
+      try {
+        return data.json['response'];
+      } catch (e) {
+        log('Response was not found for: ${data.request.method}');
+        rethrow;
+      }
+    },
     headers: {},
     body: {},
   );

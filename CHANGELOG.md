@@ -1,3 +1,17 @@
+## 0.1.0
+
+- New:
+  - Added ResponseData model with json, response and request.
+  - Added new validation callback and parse callback (`validatorFunctionFromData` and `parserFunctionFromData`)
+  which use ResponseData as argument.
+- Update:
+  - Exceptions:
+    - Added request data for exceptions.
+    - Wrapper automatically fills response and request. Also fills message and source if absent.
+  - Check whether validators and parsers are more than one.
+- Deprecated:
+  - `validatorFunctionWithResponse` argument since it replaced with `validatorFunctionFromData`
+
 ## 0.0.7
 
 - Fix: Corrected typos including class names
