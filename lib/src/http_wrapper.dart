@@ -63,34 +63,53 @@ Future<R> httpWrapper<R>({
       source: response.body,
       causedError: e,
       response: response,
+      request: request,
     );
   }
 
   try {
     await validatorFunction?.call(json);
     await validatorFunctionWithResponse?.call(json, response);
-  } on ResponseException {
-    rethrow;
+  } on ResponseException catch (e) {
+    throw e.merge(
+      ResponseException(
+        message: 'Can not validate response ${request.url} ${request.method}',
+        source: json,
+        request: request,
+        response: response,
+      ),
+    );
   } catch (e) {
     InvalidResponseException(
-      message: 'Validator function caught unhandled exception',
+      message:
+          'Can not validate response with unhandled exception ${request.url} ${request.method}: $e',
       source: json,
       causedError: e,
       response: response,
+      request: request,
     );
   }
 
   if (parserFunction != null) {
     try {
       return await parserFunction(json);
-    } on ResponseException {
-      rethrow;
+    } on ResponseException catch (e) {
+      throw e.merge(
+        ResponseException(
+          message: 'Can not parse response ${request.url} ${request.method}',
+          source: json,
+          request: request,
+          response: response,
+        ),
+      );
     } catch (e) {
       throw ResponseParseException(
-        message: e.toString(),
+        message:
+            'Can not parse response with unhandled exception ${request.url} ${request.method}: $e',
         source: json,
         causedError: e,
         response: response,
+        request: request,
       );
     }
   } else {
