@@ -2,13 +2,19 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:http_wrapper/src/http_wrapper_response_data.dart';
 
 import 'http_wrapper_exceptions.dart';
 
-typedef ParserFunction<T> = FutureOr<T> Function(dynamic json);
+typedef ParserFunction<R> = FutureOr<R> Function(dynamic json);
 typedef ValidatorFunction = FutureOr Function(dynamic json);
+
+@Deprecated('Use ValidatorFunctionFromData instead')
 typedef ValidatorFunctionWithResponse = FutureOr Function(
-    dynamic json, Response response);
+    ResponseData data, Response response);
+
+typedef ParserFunctionFromData<R> = FutureOr<R> Function(ResponseData data);
+typedef ValidatorFunctionFromData = FutureOr Function(ResponseData data);
 
 /// Base http request processor
 ///
@@ -38,16 +44,31 @@ Future<R> httpWrapper<R>({
   required BaseRequest request,
   ParserFunction<R>? parserFunction,
   ValidatorFunction? validatorFunction,
+  @Deprecated('Use validatorFunctionFromData instead')
   ValidatorFunctionWithResponse? validatorFunctionWithResponse,
+  ValidatorFunctionFromData? validatorFunctionFromData,
+  ParserFunctionFromData<R>? parserFunctionFromData,
   @Deprecated('Set encoding for request') Encoding? encoding,
 }) async {
   assert(
-    validatorFunction == null || validatorFunctionWithResponse == null,
-    'Either validatorFunction or validatorFunctionWithResponse should be used for httpWrapper',
+    _countBoolIterable(
+            [parserFunction == null || parserFunctionFromData == null]) <=
+        1,
+    'Only one or none parser function must be used for httpWrapper',
+  );
+  assert(
+    _countBoolIterable([
+          validatorFunction == null ||
+              validatorFunctionWithResponse == null ||
+              validatorFunctionFromData == null
+        ]) <=
+        1,
+    'Only one or none validator function must be used for httpWrapper',
   );
 
   final Response response;
   final dynamic json;
+  final ResponseData responseData;
 
   try {
     response = await Response.fromStream(await request.send());
@@ -67,9 +88,12 @@ Future<R> httpWrapper<R>({
     );
   }
 
+  responseData = ResponseData(json: json, response: response, request: request);
+
   try {
-    await validatorFunction?.call(json);
-    await validatorFunctionWithResponse?.call(json, response);
+    await validatorFunction?.call(responseData);
+    await validatorFunctionWithResponse?.call(responseData, response);
+    await validatorFunctionFromData?.call(responseData);
   } on ResponseException catch (e) {
     throw e.merge(
       ResponseException(
@@ -90,9 +114,13 @@ Future<R> httpWrapper<R>({
     );
   }
 
-  if (parserFunction != null) {
+  if (parserFunction != null || parserFunctionFromData != null) {
     try {
-      return await parserFunction(json);
+      if (parserFunctionFromData != null) {
+        return await parserFunctionFromData(responseData);
+      } else {
+        return await parserFunction!(json);
+      }
     } on ResponseException catch (e) {
       throw e.merge(
         ResponseException(
@@ -135,7 +163,10 @@ Future<R> getRequest<R>({
   ParserFunction<R>? parserFunction,
   Map<String, String>? headers,
   ValidatorFunction? validatorFunction,
+  @Deprecated('Use validatorFunctionFromData instead')
   ValidatorFunctionWithResponse? validatorFunctionWithResponse,
+  ParserFunctionFromData<R>? parserFunctionFromData,
+  ValidatorFunctionFromData? validatorFunctionFromData,
   @Deprecated('Set encoding for request') Encoding? encoding,
 }) {
   final request = Request('GET', uri);
@@ -175,7 +206,10 @@ Future<R> postRequest<R>({
   Map<String, String>? headers,
   Map<String, dynamic>? body,
   ValidatorFunction? validatorFunction,
+  @Deprecated('Use validatorFunctionFromData instead')
   ValidatorFunctionWithResponse? validatorFunctionWithResponse,
+  ParserFunctionFromData<R>? parserFunctionFromData,
+  ValidatorFunctionFromData? validatorFunctionFromData,
   @Deprecated('Set encoding for request') Encoding? encoding,
 }) {
   final request = Request('POST', uri);
@@ -215,7 +249,10 @@ Future<R> getMultipartRequest<R>({
   ParserFunction<R>? parserFunction,
   Map<String, String>? headers,
   ValidatorFunction? validatorFunction,
+  @Deprecated('Use validatorFunctionFromData instead')
   ValidatorFunctionWithResponse? validatorFunctionWithResponse,
+  ParserFunctionFromData<R>? parserFunctionFromData,
+  ValidatorFunctionFromData? validatorFunctionFromData,
   @Deprecated('Set encoding for request') Encoding? encoding,
 }) {
   final request = MultipartRequest('GET', uri);
@@ -259,7 +296,10 @@ Future<R> postMultipartRequest<R>({
   Map<String, String>? fields,
   Iterable<MultipartFile>? files,
   ValidatorFunction? validatorFunction,
+  @Deprecated('Use validatorFunctionFromData instead')
   ValidatorFunctionWithResponse? validatorFunctionWithResponse,
+  ParserFunctionFromData<R>? parserFunctionFromData,
+  ValidatorFunctionFromData? validatorFunctionFromData,
   @Deprecated('Set encoding for request') Encoding? encoding,
 }) {
   final request = MultipartRequest('POST', uri);
@@ -283,4 +323,16 @@ Future<R> postMultipartRequest<R>({
     validatorFunction: validatorFunction,
     validatorFunctionWithResponse: validatorFunctionWithResponse,
   );
+}
+
+int _countBoolIterable(Iterable<bool> iterable) {
+  int count = 0;
+
+  for (final e in iterable) {
+    if (e) {
+      count++;
+    }
+  }
+
+  return count;
 }
