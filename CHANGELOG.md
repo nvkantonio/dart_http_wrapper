@@ -1,3 +1,7 @@
+## 0.1.1
+
+- Bugfix: `postMultipartRequest` does not add files to http request.
+
 ## 0.1.0
 
 - New:

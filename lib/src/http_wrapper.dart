@@ -312,7 +312,7 @@ Future<R> postMultipartRequest<R>({
     request.fields.addAll(fields);
   }
 
-  if (files != null && files.isEmpty) {
+  if (files != null && files.isNotEmpty) {
     request.files.addAll(files);
   }
 
