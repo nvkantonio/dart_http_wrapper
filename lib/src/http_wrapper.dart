@@ -180,6 +180,8 @@ Future<R> getRequest<R>({
     parserFunction: parserFunction,
     encoding: encoding,
     validatorFunction: validatorFunction,
+    parserFunctionFromData: parserFunctionFromData,
+    validatorFunctionFromData: validatorFunctionFromData,
     validatorFunctionWithResponse: validatorFunctionWithResponse,
   );
 }
@@ -227,6 +229,8 @@ Future<R> postRequest<R>({
     parserFunction: parserFunction,
     encoding: encoding,
     validatorFunction: validatorFunction,
+    parserFunctionFromData: parserFunctionFromData,
+    validatorFunctionFromData: validatorFunctionFromData,
     validatorFunctionWithResponse: validatorFunctionWithResponse,
   );
 }
@@ -266,6 +270,8 @@ Future<R> getMultipartRequest<R>({
     parserFunction: parserFunction,
     encoding: encoding,
     validatorFunction: validatorFunction,
+    parserFunctionFromData: parserFunctionFromData,
+    validatorFunctionFromData: validatorFunctionFromData,
     validatorFunctionWithResponse: validatorFunctionWithResponse,
   );
 }
@@ -321,6 +327,8 @@ Future<R> postMultipartRequest<R>({
     parserFunction: parserFunction,
     encoding: encoding,
     validatorFunction: validatorFunction,
+    parserFunctionFromData: parserFunctionFromData,
+    validatorFunctionFromData: validatorFunctionFromData,
     validatorFunctionWithResponse: validatorFunctionWithResponse,
   );
 }

@@ -1,3 +1,7 @@
+## 0.1.2
+
+- Bugfix: parserFunctionFromData and validatorFunctionFromData was not implemented.
+
 ## 0.1.1
 
 - Bugfix: `postMultipartRequest` does not add files to http request.
