@@ -1,3 +1,7 @@
+## 0.1.3
+
+- BugFix: save exceptions stacktrace
+
 ## 0.1.2
 
 - Bugfix: parserFunctionFromData and validatorFunctionFromData was not implemented.

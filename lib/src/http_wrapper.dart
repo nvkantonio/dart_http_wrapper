@@ -78,14 +78,16 @@ Future<R> httpWrapper<R>({
 
   try {
     json = jsonDecode(response.body);
-  } catch (e) {
-    throw InvalidResponseException(
-      message: 'Cannot parse response to json',
-      source: response.body,
-      causedError: e,
-      response: response,
-      request: request,
-    );
+  } catch (e, st) {
+    Error.throwWithStackTrace(
+        InvalidResponseException(
+          message: 'Cannot parse response to json',
+          source: response.body,
+          causedError: e,
+          response: response,
+          request: request,
+        ),
+        st);
   }
 
   responseData = ResponseData(json: json, response: response, request: request);
@@ -94,24 +96,29 @@ Future<R> httpWrapper<R>({
     await validatorFunction?.call(responseData);
     await validatorFunctionWithResponse?.call(responseData, response);
     await validatorFunctionFromData?.call(responseData);
-  } on ResponseException catch (e) {
-    throw e.merge(
-      ResponseException(
-        message: 'Can not validate response ${request.url} ${request.method}',
-        source: json,
-        request: request,
-        response: response,
-      ),
-    );
-  } catch (e) {
-    InvalidResponseException(
-      message:
-          'Can not validate response with unhandled exception ${request.url} ${request.method}: $e',
-      source: json,
-      causedError: e,
-      response: response,
-      request: request,
-    );
+  } on ResponseException catch (e, st) {
+    Error.throwWithStackTrace(
+        e.merge(
+          ResponseException(
+            message:
+                'Can not validate response ${request.url} ${request.method}',
+            source: json,
+            request: request,
+            response: response,
+          ),
+        ),
+        st);
+  } catch (e, st) {
+    Error.throwWithStackTrace(
+        InvalidResponseException(
+          message:
+              'Can not validate response with unhandled exception ${request.url} ${request.method}: $e',
+          source: json,
+          causedError: e,
+          response: response,
+          request: request,
+        ),
+        st);
   }
 
   if (parserFunction != null || parserFunctionFromData != null) {
@@ -121,24 +128,29 @@ Future<R> httpWrapper<R>({
       } else {
         return await parserFunction!(json);
       }
-    } on ResponseException catch (e) {
-      throw e.merge(
-        ResponseException(
-          message: 'Can not parse response ${request.url} ${request.method}',
-          source: json,
-          request: request,
-          response: response,
-        ),
-      );
-    } catch (e) {
-      throw ResponseParseException(
-        message:
-            'Can not parse response with unhandled exception ${request.url} ${request.method}: $e',
-        source: json,
-        causedError: e,
-        response: response,
-        request: request,
-      );
+    } on ResponseException catch (e, st) {
+      Error.throwWithStackTrace(
+          e.merge(
+            ResponseException(
+              message:
+                  'Can not parse response ${request.url} ${request.method}',
+              source: json,
+              request: request,
+              response: response,
+            ),
+          ),
+          st);
+    } catch (e, st) {
+      Error.throwWithStackTrace(
+          ResponseParseException(
+            message:
+                'Can not parse response with unhandled exception ${request.url} ${request.method}: $e',
+            source: json,
+            causedError: e,
+            response: response,
+            request: request,
+          ),
+          st);
     }
   } else {
     return json;
